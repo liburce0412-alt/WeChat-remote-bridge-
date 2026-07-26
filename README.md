@@ -1,5 +1,10 @@
 # WeChat Remote Bridge for Codex
 
+[![Release](https://img.shields.io/github/v/release/liburce0412-alt/WeChat-remote-bridge-?include_prereleases&label=release)](https://github.com/liburce0412-alt/WeChat-remote-bridge-/releases)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+![Platform](https://img.shields.io/badge/platform-Windows-0078D4)
+![Node.js](https://img.shields.io/badge/Node.js-%3E%3D22-339933)
+
 > A Windows-first bridge that lets a personal WeChat account continue and operate local Codex Desktop tasks.
 >
 > 通过个人微信远程续接和操作本机 Codex Desktop 任务。
@@ -34,6 +39,7 @@ Codex 与 GPT-Live 使用本机 ChatGPT/Codex 登录态及对应额度。
 - [开发与测试](#开发与测试)
 - [项目结构](#项目结构)
 - [已知限制](#已知限制)
+- [参与项目](#参与项目)
 - [许可证与第三方代码](#许可证与第三方代码)
 
 ## 功能概览
@@ -538,6 +544,10 @@ Windows 工作流模板位于 [`ci/windows.yml`](ci/windows.yml)。将其复制�
 │  └─ transcribe_worker.py   # faster-whisper 常驻 worker
 ├─ test/                     # 单元测试和可选真实集成测试
 ├─ ci/windows.yml            # GitHub Actions 模板
+├─ CONTRIBUTING.md           # 开发与提交规范
+├─ SECURITY.md               # 漏洞报告方式
+├─ CHANGELOG.md              # 版本变更记录
+├─ LICENSE                   # MIT 许可证
 └─ THIRD_PARTY_NOTICES.md
 ```
 
@@ -552,11 +562,17 @@ Windows 工作流模板位于 [`ci/windows.yml`](ci/windows.yml)。将其复制�
 - 本地后备搜索对超大 rollout 只索引最近 16 MB，不保证命中任意早期内容。
 - 安全模式不是容器或虚拟机隔离；它依赖 Codex sandbox 行为。
 
+## 参与项目
+
+- 提交 Bug 或功能建议前，请阅读 [`CONTRIBUTING.md`](CONTRIBUTING.md)。
+- 安全漏洞不要发布到公开 Issue，请按 [`SECURITY.md`](SECURITY.md) 私下报告。
+- 版本变化见 [`CHANGELOG.md`](CHANGELOG.md)。
+- 参与讨论和贡献代码即表示同意遵守 [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md)。
+
 ## 许可证与第三方代码
+
+本项目以 [MIT License](LICENSE) 开源。
 
 `src/weixin/` 中的 iLink 适配源自腾讯
 `@tencent-weixin/openclaw-weixin@2.4.6`，其 MIT 许可证文本见
 [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md)。
-
-仓库目前尚未包含项目自身的 `LICENSE` 文件。公开仓库并不自动授予复制、修改和分发
-权限；正式对外发布前，维护者应明确选择并添加项目许可证，例如 MIT 或 Apache-2.0。

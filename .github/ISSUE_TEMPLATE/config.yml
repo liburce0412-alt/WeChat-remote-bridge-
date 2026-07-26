@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/liburce0412-alt/WeChat-remote-bridge-/security/advisories/new
+    about: 请通过 Private vulnerability reporting 私下提交安全问题。

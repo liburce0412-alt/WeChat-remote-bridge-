@@ -1,0 +1,48 @@
+name: Feature request
+description: 建议新的能力或改进
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: 使用场景
+      description: 你遇到了什么问题？不要只描述想要的实现。
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 建议方案
+      description: 描述期望行为、交互方式和可能的替代方案。
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: 涉及模块
+      options:
+        - 微信消息与媒体
+        - Codex 任务
+        - GPT-Live 语音
+        - 持久化与恢复
+        - Windows 服务
+        - 文档与开发体验
+        - 其他
+    validations:
+      required: true
+  - type: textarea
+    id: risks
+    attributes:
+      label: 风险与兼容性
+      description: 是否会改变安全边界、执行语义、状态格式或消耗额度？
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: 提交确认
+      options:
+        - label: 我已搜索现有 Issue，未发现相同建议。
+          required: true
+        - label: 我没有在内容中提交个人信息或凭据。
+          required: true

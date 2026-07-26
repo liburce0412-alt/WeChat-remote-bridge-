@@ -1,0 +1,70 @@
+name: Bug report
+description: 报告可复现的功能异常
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢反馈。提交前请删除 token、二维码、微信聊天内容、任务全文和个人路径。
+        安全漏洞请使用仓库的 Private vulnerability reporting，不要填写此表单。
+  - type: input
+    id: bridge-version
+    attributes:
+      label: Bridge 版本
+      description: Release 版本或 git commit。
+      placeholder: v0.1.0
+    validations:
+      required: true
+  - type: input
+    id: codex-version
+    attributes:
+      label: Codex 版本
+      description: 运行 npm list @openai/codex 后显示的版本。
+      placeholder: 0.146.0-alpha.3.1
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: 环境
+      description: Windows、Node.js 版本，以及前台或计划任务运行。
+      placeholder: Windows 11 24H2 / Node.js 22 / Scheduled Task
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: 问题描述
+      description: 实际发生了什么，预期结果是什么？
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: 复现步骤
+      description: 请提供最小、稳定的复现步骤。
+      placeholder: |
+        1. 启动 Bridge
+        2. 发送……
+        3. 观察到……
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: 已脱敏日志
+      description: 可选。请先删除凭据、消息正文、任务 ID 和个人路径。
+      render: text
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: 提交确认
+      options:
+        - label: 我已运行 `npm run doctor` 并查看 README 的故障排查章节。
+          required: true
+        - label: 我已确认内容中没有凭据、二维码、聊天隐私或其他敏感信息。
+          required: true
+        - label: 这不是需要私下报告的安全漏洞。
+          required: true
