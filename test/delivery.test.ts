@@ -4,7 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { RealtimeManager } from "../src/codex/realtime.js";
-import { DeliveryQueue, retryDelayMs, VOICE_ATTACHMENT_NAME } from "../src/delivery.js";
+import { DeliveryQueue, retryDelayMs } from "../src/delivery.js";
 import type { Logger } from "../src/logger.js";
 import type { StateStore } from "../src/state.js";
 import { EMPTY_STATE, type BridgeState } from "../src/types.js";
@@ -78,7 +78,7 @@ describe("DeliveryQueue", () => {
 
     expect(state.outbox).toEqual([]);
     expect(sent).toHaveLength(1);
-    expect(sent[0].name).toBe(VOICE_ATTACHMENT_NAME);
+    expect(sent[0].name).toBe("GPT-Live语音.wav");
     expect(sent[0].audio.subarray(0, 4).toString("ascii")).toBe("RIFF");
     expect(sent[0].clientId).toMatch(/^[0-9a-f-]{36}$/);
     expect(saves.length).toBeGreaterThanOrEqual(2);

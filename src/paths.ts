@@ -54,6 +54,15 @@ export function safeModeEnabled(): boolean {
   return process.env.WEIXIN_CODEX_SAFE_MODE === "1";
 }
 
+export function voiceAttachmentName(): string {
+  const configured = process.env.WEIXIN_CODEX_AUDIO_FILENAME?.trim();
+  const fileName = path.basename(configured || "GPT-Live语音.wav")
+    .replace(/[<>:"/\\|?*\u0000-\u001f]/g, "_")
+    .trim();
+  if (!fileName) return "GPT-Live语音.wav";
+  return fileName.toLocaleLowerCase().endsWith(".wav") ? fileName : `${fileName}.wav`;
+}
+
 export function findWhisperModel(): string | undefined {
   const configured = process.env.WEIXIN_CODEX_WHISPER_MODEL;
   if (configured && fs.existsSync(configured)) return configured;

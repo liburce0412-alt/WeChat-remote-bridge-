@@ -7,7 +7,7 @@ import {
   type RealtimeFailure,
 } from "./codex/realtime.js";
 import { parseCommand } from "./commands.js";
-import { DeliveryQueue, VOICE_ATTACHMENT_NAME } from "./delivery.js";
+import { DeliveryQueue } from "./delivery.js";
 import { Logger } from "./logger.js";
 import { heartbeatFile, isProjectPathAllowed, safeModeEnabled } from "./paths.js";
 import { describeProgress } from "./progress.js";
@@ -28,7 +28,6 @@ import { MessageItemType, type WeixinMessage } from "./weixin/types.js";
 import { disableBridgeService } from "./windows-service.js";
 
 const CDN_BASE_URL = "https://novac2c.cdn.weixin.qq.com/c2c";
-export { VOICE_ATTACHMENT_NAME };
 const HELP = [
   "微信 Codex Bridge 指令：",
   "继续 <任务名称或历史内容> — 查找并续接桌面任务",

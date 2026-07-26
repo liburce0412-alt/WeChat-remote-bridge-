@@ -9,13 +9,11 @@ import {
   toSpeakableText,
 } from "./codex/realtime.js";
 import { Logger } from "./logger.js";
-import { dataDirectory } from "./paths.js";
+import { dataDirectory, voiceAttachmentName } from "./paths.js";
 import { StateStore } from "./state.js";
 import type { BridgeState, OutboxEntry, SpeechOutboxEntry } from "./types.js";
 import { WeixinClient } from "./weixin/client.js";
 import { pcm16ToWav } from "./weixin/media.js";
-
-export const VOICE_ATTACHMENT_NAME = "迟迟的语音.wav";
 
 export class DeliveryQueue {
   private flushing?: Promise<void>;
@@ -85,7 +83,7 @@ export class DeliveryQueue {
       threadId,
       text: toSpeakableText(text),
       fallbackText: text,
-      name: VOICE_ATTACHMENT_NAME,
+      name: voiceAttachmentName(),
       contextToken,
       createdAt: Date.now(),
       attempts: 0,

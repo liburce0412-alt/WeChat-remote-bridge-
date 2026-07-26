@@ -6,7 +6,7 @@ import { assertSafeToResumeThread, inspectThreadActivity, staleOpenTurnIds } fro
 
 describe("thread activity guard", () => {
   let root: string;
-  const threadId = "019f7e89-afe8-7c02-82c9-f4542ba73ef0";
+  const threadId = "11111111-1111-4111-8111-111111111111";
 
   beforeEach(() => {
     root = fs.mkdtempSync(path.join(os.tmpdir(), "weixin-codex-activity-"));

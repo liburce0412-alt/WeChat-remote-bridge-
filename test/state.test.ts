@@ -51,7 +51,7 @@ describe("StateStore", () => {
       threadId: "thread-1",
       text: "执行完成",
       fallbackText: "执行完成",
-      name: "迟迟的语音.wav",
+      name: "GPT-Live语音.wav",
       createdAt: 123456791,
       attempts: 0,
     });
@@ -60,7 +60,7 @@ describe("StateStore", () => {
       kind: "file",
       to: "wx-user",
       path: "C:\\temp\\audio.wav",
-      name: "迟迟的语音.wav",
+      name: "GPT-Live语音.wav",
       mediaKind: "audio",
       managed: true,
       createdAt: 123456792,
