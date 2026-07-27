@@ -68,6 +68,7 @@ describe("StateStore", () => {
     });
     state.pendingSelection = {
       originalText: "好了",
+      page: 1,
       candidates: [{
         kind: "thread",
         id: "thread-1",

@@ -120,6 +120,28 @@ export class CodexClient extends EventEmitter {
     return result.data;
   }
 
+  async listAllThreads(): Promise<CodexThread[]> {
+    const threads: CodexThread[] = [];
+    let cursor: string | undefined;
+    do {
+      const result = await this.request<{
+        data: CodexThread[];
+        nextCursor?: string | null;
+      }>("thread/list", {
+        cursor,
+        limit: 100,
+        sortKey: "recency_at",
+        sortDirection: "desc",
+        archived: false,
+        useStateDbOnly: true,
+      });
+      threads.push(...result.data);
+      if (!result.nextCursor || result.nextCursor === cursor) break;
+      cursor = result.nextCursor;
+    } while (true);
+    return threads;
+  }
+
   async searchThreads(searchTerm: string, limit = 5): Promise<ThreadSearchResult[]> {
     const [contentMatches, titleMatches] = await Promise.all([
       this.request<{ data: ThreadSearchResult[] }>("thread/search", {

@@ -24,6 +24,7 @@ export interface PendingSelection {
   originalText?: string;
   attachments?: TurnAttachment[];
   voiceReply?: boolean;
+  page?: number;
   candidates: SelectionCandidate[];
 }
 

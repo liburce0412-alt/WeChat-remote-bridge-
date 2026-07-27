@@ -33,6 +33,7 @@ const HELP = [
   "继续 <任务名称或历史内容> — 查找并续接桌面任务",
   "新任务 <需求> — 选择项目后创建任务",
   "最近 — 查看最近任务",
+  "下一页 / 上一页 — 浏览任务候选列表",
   "当前 — 查看当前绑定和运行状态",
   "停止 — 中断当前任务并清理后台终端",
   "取消绑定 — 退出当前任务",
@@ -348,10 +349,32 @@ export class Bridge {
       await this.store.save(this.state);
       return await this.reply("已切换到新建任务模式。请发送新任务的完整需求。", entry.message);
     }
+    if (!this.state.boundThreadId && text.trim() === "继续") {
+      return await this.showRecent(text, entry.message, attachments, this.state.voiceModeEnabled);
+    }
     if (this.state.pendingSelection) {
-      const index = findCandidateIndex(this.state.pendingSelection.candidates, text);
+      const pending = this.state.pendingSelection;
+      const currentPage = clampSelectionPage(pending.candidates, pending.page ?? 0);
+      if (isNextPage(text) || isPreviousPage(text)) {
+        const direction = isNextPage(text) ? 1 : -1;
+        const nextPage = clampSelectionPage(pending.candidates, currentPage + direction);
+        pending.page = nextPage;
+        await this.store.save(this.state);
+        const boundary = nextPage === currentPage
+          ? (direction > 0 ? "已经是最后一页。" : "已经是第一页。")
+          : undefined;
+        await this.reply(
+          [boundary, formatCandidates(pending.candidates, nextPage)].filter(Boolean).join("\n"),
+          entry.message,
+        );
+        return;
+      }
+      const index = findCandidateIndex(pending.candidates, text, currentPage);
       if (index < 0) {
-        await this.reply(`没有找到“${text}”。请直接回复列表中的任务名称。`, entry.message);
+        await this.reply(
+          `没有找到“${text}”。请回复当前页序号、任务名称，或“下一页/上一页”。`,
+          entry.message,
+        );
         return;
       }
       await this.selectCandidate(index + 1, entry);
@@ -416,8 +439,8 @@ export class Bridge {
   }
 
   private async showRecent(originalText: string | undefined, message: WeixinMessage, attachments: TurnAttachment[] = [], voiceReply = false): Promise<void> {
-    const threads = await this.codex.listThreads(8);
-    const candidates: SelectionCandidate[] = threads.slice(0, 5).map((thread) => ({
+    const threads = await this.codex.listAllThreads();
+    const candidates: SelectionCandidate[] = threads.map((thread) => ({
       kind: "thread",
       id: thread.id,
       label: thread.name ?? (thread.preview || thread.id),
@@ -428,15 +451,14 @@ export class Bridge {
       if (!thread.cwd || seen.has(thread.cwd)) continue;
       seen.add(thread.cwd);
       candidates.push({ kind: "project", id: thread.cwd, label: path.basename(thread.cwd), cwd: thread.cwd });
-      if (candidates.length >= 8) break;
     }
     if (!candidates.length) {
       await this.reply("没有找到可用的桌面任务或项目。", message);
       return;
     }
-    this.state.pendingSelection = { originalText, attachments, voiceReply, candidates };
+    this.state.pendingSelection = { originalText, attachments, voiceReply, page: 0, candidates };
     await this.store.save(this.state);
-    await this.reply(formatCandidates(candidates), message);
+    await this.reply(formatCandidates(candidates, 0), message);
   }
 
   private async searchAndSelect(term: string, originalText: string | undefined, message: WeixinMessage): Promise<void> {
@@ -867,20 +889,28 @@ function messageKey(message: WeixinMessage): string {
   return String(message.message_id ?? message.client_id ?? message.item_list?.[0]?.msg_id ?? `${message.from_user_id}:${message.create_time_ms}`);
 }
 
-export function formatCandidates(candidates: SelectionCandidate[]): string {
+const SELECTION_PAGE_SIZE = 10;
+
+export function formatCandidates(candidates: SelectionCandidate[], page = 0): string {
+  const currentPage = clampSelectionPage(candidates, page);
+  const pageCount = Math.max(1, Math.ceil(candidates.length / SELECTION_PAGE_SIZE));
+  const start = currentPage * SELECTION_PAGE_SIZE;
+  const visible = candidates.slice(start, start + SELECTION_PAGE_SIZE);
   return [
-    "请选择要继续的任务或新任务项目：",
-    ...candidates.map((candidate, index) => `${index + 1}. ${candidate.label}`),
-    "请回复序号或任务名称。",
+    `请选择要继续的任务或新任务项目（第 ${currentPage + 1}/${pageCount} 页，共 ${candidates.length} 项）：`,
+    ...visible.map((candidate, index) => `${index + 1}. ${candidate.label}`),
+    pageCount > 1 ? "请回复当前页序号、任务名称，或“下一页/上一页”。" : "请回复序号或任务名称。",
   ].join("\n");
 }
 
-export function findCandidateIndex(candidates: SelectionCandidate[], input: string): number {
+export function findCandidateIndex(candidates: SelectionCandidate[], input: string, page = 0): number {
   const text = input.trim().toLocaleLowerCase();
   if (!text) return -1;
   if (/^\d+$/.test(text)) {
-    const legacyIndex = Number(text) - 1;
-    return legacyIndex >= 0 && legacyIndex < candidates.length ? legacyIndex : -1;
+    const pageIndex = Number(text) - 1;
+    if (pageIndex < 0 || pageIndex >= SELECTION_PAGE_SIZE) return -1;
+    const index = clampSelectionPage(candidates, page) * SELECTION_PAGE_SIZE + pageIndex;
+    return index < candidates.length ? index : -1;
   }
   const exact = candidates.findIndex((candidate) => candidate.label.trim().toLocaleLowerCase() === text);
   if (exact >= 0) return exact;
@@ -888,6 +918,19 @@ export function findCandidateIndex(candidates: SelectionCandidate[], input: stri
     .map((candidate, index) => ({ index, label: candidate.label.toLocaleLowerCase() }))
     .filter((candidate) => candidate.label.includes(text));
   return partial.length === 1 ? partial[0]!.index : -1;
+}
+
+function clampSelectionPage(candidates: SelectionCandidate[], page: number): number {
+  const lastPage = Math.max(0, Math.ceil(candidates.length / SELECTION_PAGE_SIZE) - 1);
+  return Math.max(0, Math.min(Math.floor(page), lastPage));
+}
+
+function isNextPage(input: string): boolean {
+  return ["下一页", "下页", "下一批"].includes(input.trim());
+}
+
+function isPreviousPage(input: string): boolean {
+  return ["上一页", "上页", "上一批"].includes(input.trim());
 }
 
 function mask(value: string): string {

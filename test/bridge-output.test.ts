@@ -52,4 +52,24 @@ describe("task selection display", () => {
   it("selects numbered replies", () => {
     expect(findCandidateIndex(candidates, "2")).toBe(1);
   });
+
+  it("paginates all candidates in groups of ten and keeps page-local numbering", () => {
+    const manyCandidates = Array.from({ length: 13 }, (_, index): SelectionCandidate => ({
+      kind: "thread",
+      id: `thread-${index + 1}`,
+      label: `任务 ${index + 1}`,
+      cwd: `C:\\work\\${index + 1}`,
+    }));
+
+    const firstPage = formatCandidates(manyCandidates, 0);
+    expect(firstPage).toContain("第 1/2 页，共 13 项");
+    expect(firstPage).toContain("10. 任务 10");
+    expect(firstPage).not.toContain("任务 11");
+
+    const secondPage = formatCandidates(manyCandidates, 1);
+    expect(secondPage).toContain("第 2/2 页，共 13 项");
+    expect(secondPage).toContain("1. 任务 11");
+    expect(secondPage).toContain("3. 任务 13");
+    expect(findCandidateIndex(manyCandidates, "2", 1)).toBe(11);
+  });
 });

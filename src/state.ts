@@ -60,6 +60,7 @@ const stateSchema = z.object({
       name: z.string(),
     })).optional(),
     voiceReply: z.boolean().optional(),
+    page: z.number().int().nonnegative().optional(),
     candidates: z.array(z.object({
       kind: z.enum(["thread", "project"]),
       id: z.string(),
